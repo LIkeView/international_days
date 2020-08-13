@@ -1,19 +1,14 @@
 import 'dart:convert';
 import 'dart:math';
-
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-//import 'package:flutter_native_admob/flutter_native_admob.dart';
-//import 'package:flutter_native_admob/native_admob_controller.dart';
+import 'package:flutter_native_admob/flutter_native_admob.dart';
+import 'package:flutter_native_admob/native_admob_controller.dart';
 import 'package:http/http.dart' as http;
-
 import 'model/color.dart';
 
 class February extends StatefulWidget {
-
-
-
   @override
 
   _februaryState createState() => _februaryState();
@@ -21,20 +16,21 @@ class February extends StatefulWidget {
 
 class _februaryState extends State<February>{
 
-//  static const _adUnitID = "ca-app-pub-3940256099942544/8135179316";
-//  final _nativeAdController = NativeAdmobController();
+
 
   final String url = "http://4foxwebsolution.com/festivals.com/api/getFestivals";
   List data;
   var  newdata;
   String value = "2";
 
+  final _nativeAdController = NativeAdmobController();
+  static const _adUnitID = "ca-app-pub-8592144969637455/8186518809";
+
   Future<String> getJsonData() async{
     var response = await http.post(
       // Encode the url
         Uri.encodeFull(url), body: {
       "fest_id" : value ,
-
     }
 
     );
@@ -102,6 +98,19 @@ class _februaryState extends State<February>{
   void changeIndex() {
     setState(() => index = random.nextInt(200));
   }
+  Widget adsContainer(){
+    return Container(
+      height: 250,
+      child: NativeAdmob(
+        // Your ad unit id
+        adUnitID: _adUnitID,
+        controller: _nativeAdController,
+        type: NativeAdmobType.full,
+        error: CupertinoActivityIndicator(),
+      ),
+    );
+  }
+
   Widget build(BuildContext context){
     return
       SafeArea(
@@ -111,9 +120,11 @@ class _februaryState extends State<February>{
           new ListView.builder(
               itemCount: data == null ? 0 : data.length,
               itemBuilder: (BuildContext context, int index){
+                if (index % 5 == 0 && index > 0) {
+                  return adsContainer();
+                }
+                else {
                   return new Container(
-
-
 
                     child: Card(
                       shape: RoundedRectangleBorder(
@@ -158,6 +169,7 @@ class _februaryState extends State<February>{
 
 
               }
+           }
           ),
         ),
 

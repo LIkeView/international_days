@@ -1,13 +1,11 @@
 import 'dart:convert';
 import 'dart:math';
-
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-//import 'package:flutter_native_admob/flutter_native_admob.dart';
-//import 'package:flutter_native_admob/native_admob_controller.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_native_admob/flutter_native_admob.dart';
+import 'package:flutter_native_admob/native_admob_controller.dart';
 
 import 'model/color.dart';
 
@@ -28,6 +26,10 @@ class _januaryState extends State<January>{
   List data;
   var  newdata;
   String value = "1";
+
+  final _nativeAdController = NativeAdmobController();
+  static const _adUnitID = "ca-app-pub-8592144969637455/8186518809";
+
 
   Future<String> getJsonData() async{
     var response = await http.post(
@@ -97,6 +99,19 @@ class _januaryState extends State<January>{
   void changeIndex() {
     setState(() => index = random.nextInt(200));
   }
+
+  Widget adsContainer(){
+    return Container(
+      height: 250,
+      child: NativeAdmob(
+        // Your ad unit id
+        adUnitID: _adUnitID,
+        controller: _nativeAdController,
+        type: NativeAdmobType.full,
+        error: CupertinoActivityIndicator(),
+      ),
+    );
+  }
   Widget build(BuildContext context){
     return
       SafeArea(
@@ -104,17 +119,11 @@ class _januaryState extends State<January>{
         body:
         new ListView.builder(
             itemCount: data == null ? 0 : data.length,
-            itemBuilder: (BuildContext context, int index){
-//              if(index % 5 == 0 && index > 0){
-//                return NativeAdmobBannerView(
-//                  // Your ad unit id
-//                  adUnitID: _adUnitID,
-//                  showMedia: true,
-//                  style: BannerStyle.dark,
-//                  contentPadding: EdgeInsets.fromLTRB(9.0,8.0,8.0,8.0),
-//                );
-//              }
-//              else{
+            itemBuilder: (BuildContext context, int index) {
+              if (index % 5 == 0 && index > 0) {
+                return adsContainer();
+              }
+              else {
                 return new Container(
                   child: Card(
                     shape: RoundedRectangleBorder(
@@ -129,33 +138,47 @@ class _januaryState extends State<January>{
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Padding(
-                              padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
+                              padding: const EdgeInsets.only(
+                                  top: 8.0, bottom: 4.0),
                               child: Text(
-                                  data[index]["fes_name"], style: new TextStyle(fontSize: 30.0,color: Colors.white)
+                                  data[index]["fes_name"], style: new TextStyle(
+                                  fontSize: 30.0, color: Colors.white)
                               )
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 4.0, bottom: 30.0),
-                            child: Text(data[index]["m_date"], style: new TextStyle(fontSize: 20.0,color: Colors.white)),
+                            padding: const EdgeInsets.only(
+                                top: 4.0, bottom: 30.0),
+                            child: Text(data[index]["m_date"],
+                                style: new TextStyle(
+                                    fontSize: 20.0, color: Colors.white)),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
-                            child: Text(data[index]["fes_cat"],maxLines: 2, style: new TextStyle(fontSize: 20.0,color: Colors.white)),
+                            padding: const EdgeInsets.only(
+                                top: 4.0, bottom: 4.0),
+                            child: Text(data[index]["fes_cat"], maxLines: 2,
+                                style: new TextStyle(
+                                    fontSize: 20.0, color: Colors.white)),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                            child: Text("# Tag",style: new TextStyle(fontSize: 22.0,color: Colors.white70),),
+                            padding: const EdgeInsets.only(
+                                top: 8.0, bottom: 8.0),
+                            child: Text("# Tag", style: new TextStyle(
+                                fontSize: 22.0, color: Colors.white70),),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                            child: Text(data[index]["tags"],style: new TextStyle(fontSize: 18.0,color: Colors.white,
-                            ),maxLines: 2,),
+                            padding: const EdgeInsets.only(
+                                top: 8.0, bottom: 8.0),
+                            child: Text(data[index]["tags"],
+                              style: new TextStyle(
+                                fontSize: 18.0, color: Colors.white,
+                              ), maxLines: 2,),
                           )
                         ],
                       ),
                     ),
                   ),
                 );
+              }
             }
         ),
       ),

@@ -11,6 +11,11 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="International Days"
         android:icon="@mipmap/days">
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-8592144969637455~5549457619"/>
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
