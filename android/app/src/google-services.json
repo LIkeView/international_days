@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "374465476819",
+    "firebase_url": "https://leafy-emblem-283009.firebaseio.com",
+    "project_id": "leafy-emblem-283009",
+    "storage_bucket": "leafy-emblem-283009.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:374465476819:android:a51601db2a6faadd577c26",
+        "android_client_info": {
+          "package_name": "likeview.international_days"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "374465476819-uv960n0l5uodh4pq5ofirtc3jjogheub.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjKMIq1RdvBmQChbtwBNrnniyLNZDk6YA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "374465476819-uv960n0l5uodh4pq5ofirtc3jjogheub.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

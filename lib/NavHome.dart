@@ -1,78 +1,96 @@
 import 'package:flutter/material.dart';
-import 'April.dart';
-import 'August.dart';
-import 'December.dart';
-import 'February.dart';
-import 'January.dart';
-import 'July.dart';
-import 'June.dart';
-import 'March.dart';
-import 'May.dart';
-import 'November.dart';
-import 'October.dart';
-import 'September.dart';
-
+import 'package:international_days/Today.dart';
+import 'Month.dart';
 
 class NavHome extends StatefulWidget {
   @override
-
-
   _NavHomeState createState() => _NavHomeState();
 }
-
 class _NavHomeState extends State<NavHome> {
-  @override
+  DateTime _dateTime;
 
+  @override
   List<Widget> containers = [
     Container(
-      child: January(),
+      child: Today(),
     ),
     Container(
-      child: February(),
+      child: Month("1"),
     ),
     Container(
-      child: March(),
+      child: Month("2"),
     ),
     Container(
-      child: April(),
+      child: Month("3"),
     ),
     Container(
-      child: May(),
+      child: Month("4"),
     ),
     Container(
-      child: June(),
+      child: Month("5"),
     ),
     Container(
-      child: July(),
+      child: Month("6"),
     ),
     Container(
-      child: August(),
+      child: Month("7"),
     ),
     Container(
-      child: September(),
+      child: Month("8"),
     ),
     Container(
-      child: Octomber(),
+      child: Month("9"),
     ),
     Container(
-      child: November(),
+      child: Month("10"),
     ),
     Container(
-      child: December(),
+      child: Month("11"),
+    ),
+    Container(
+      child: Month("12"),
     )
   ];
 
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 12,
+      length: 13,
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.black,
           centerTitle: true,
           title: Text("International Days"),
+          actions: <Widget>[
+            IconButton(
+
+              icon: Icon(
+                Icons.calendar_today,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                // do something
+                showDatePicker(
+                    context: context,
+                    initialDate: _dateTime == null ? DateTime.now() : _dateTime,
+                    firstDate: DateTime(2001),
+                    lastDate: DateTime(2021)
+                ).then((date) {
+                  setState(() {
+                    _dateTime = date;
+                  });
+                });
+                print("darshan");
+                print(_dateTime);
+                },
+
+            )
+          ],
           bottom: TabBar(
             isScrollable: true,
             tabs: <Widget>[
+              Tab(
+                text: 'Today'.toUpperCase(),
+              ),
               Tab(
                 text: 'January',
               ),
