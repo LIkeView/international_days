@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:flutter_page_indicator/flutter_page_indicator.dart';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
@@ -114,7 +115,7 @@ class _ImageState extends State<FestImageView> {
   Widget _adsContainer(){
     return
       Container(
-        height: 100,
+        height: 60,
         child: NativeAdmob(
           // Your ad unit id
           adUnitID: Ads[random.nextInt(4)],
@@ -137,8 +138,13 @@ class _ImageState extends State<FestImageView> {
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (!snapshot.hasData) {
               return Center(
-                child: Text("Waiting..."),
-              );
+                  child: SpinKitSquareCircle(
+                    color: Colors.black,
+                    size: 50.0,
+
+//                      controller: AnimationController(vsync: this, duration: const Duration(milliseconds: 1200)
+                      )
+                  );
             } else if (snapshot.hasError) {
               return Center(
                 child: Text(
@@ -151,55 +157,59 @@ class _ImageState extends State<FestImageView> {
                 scrollDirection: Axis.vertical,
                 children:
                 List.generate(users == null ? 0 : users.length, (index) {
-                  print("Image : " + users[0]["image_path"]);
-                  return Container(
-                    padding: EdgeInsets.all(1.0),
-                    child: Center(
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        Dialog(
-                                          backgroundColor: Colors.black,
-                                          child: Column(
+                  print("Image1 : " + users[0]["image_path"]);
 
-                                             mainAxisAlignment: MainAxisAlignment.center,
-                                            children: <Widget> [
+//                  if(users[index]["image_path"]=null){
+//                    CircularProgressIndicator();
+//                  }else{
+                    return Container(
+                      padding: EdgeInsets.all(1.0),
+                      child: Center(
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          Dialog(
+                                            backgroundColor: Colors.black,
+                                            child: Column(
 
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 4.0, bottom: 4.0),
-                                                child: Container(
-                                                    child: Image(
-                                                      image: NetworkImage(users[index]["image_path"]),
-                                                      fit: BoxFit.cover,
-                                                      width: MediaQuery.of(context).size.width,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: <Widget> [
+
+                                                Padding(
+                                                  padding: const EdgeInsets.only(
+                                                      top: 4.0, bottom: 4.0),
+                                                  child: Container(
+                                                      child: Image(
+                                                        image: NetworkImage(users[index]["image_path"]),
+                                                        fit: BoxFit.cover,
+                                                        width: MediaQuery.of(context).size.width,
+                                                      )
+                                                  ),
+                                                ),
+                                                Padding(
+                                                    padding: const EdgeInsets.only(
+                                                        top: 4.0, bottom: 4.0),
+                                                    child: Ink(
+                                                      child: IconButton(
+                                                        color: Colors.white,
+                                                        icon: Icon(Icons.share),
+                                                        onPressed: () async {
+                                                          var request = await HttpClient().getUrl(Uri.parse(users[index]["image_path"]));
+                                                          var response = await request.close();
+                                                          Uint8List bytes = await consolidateHttpClientResponseBytes(response);
+                                                          await Share.file('ESYS AMLOG', 'amlog.jpg', bytes, 'image/jpg');
+                                                        },
+                                                      ),
                                                     )
                                                 ),
-                                              ),
-                                             Padding(
-                                                 padding: const EdgeInsets.only(
-                                                     top: 4.0, bottom: 4.0),
-                                                 child: Ink(
-                                                   child: IconButton(
-                                                     color: Colors.white,
-                                                     icon: Icon(Icons.share),
-                                                     onPressed: () async {
-                                                       var request = await HttpClient().getUrl(Uri.parse(users[index]["image_path"]));
-                                                       var response = await request.close();
-                                                       Uint8List bytes = await consolidateHttpClientResponseBytes(response);
-                                                       await Share.file('ESYS AMLOG', 'amlog.jpg', bytes, 'image/jpg');
-                                                     },
-                                                   ),
-                                                 )
-                                             ),
 
 
-                                            ],
-                                          ),
-                                        )
+                                              ],
+                                            ),
+                                          )
 //                                        Swiper(
 //                                          itemBuilder: (BuildContext context, int newindex) {
 //                                            this.index = newindex;
@@ -278,27 +288,31 @@ class _ImageState extends State<FestImageView> {
 //                                            width: MediaQuery.of(context).size.width,
 //                                          )),
 //                                )
-                            ));
-                          },
-                          child: Container(
-                            child: ClipRRect(
+                                  ));
+                            },
+
+                            child: Container(
+                              child: ClipRRect(
 //                                borderRadius: BorderRadius.circular(20.0),
-                              child: Image(
-                                image: NetworkImage(users[index]["image_path"]),
-                                fit: BoxFit.cover,
+
+                                child: Image(
+                                  image: NetworkImage(users[index]["image_path"]),
+                                  fit: BoxFit.cover,
 //                    width: MediaQuery.of(context).size.width,
-                                height: MediaQuery
-                                    .of(context)
-                                    .size
-                                    .height,
+                                  height: MediaQuery
+                                      .of(context)
+                                      .size
+                                      .height,
+                                ),
                               ),
                             ),
-                          ),
-                        )
+                          )
 //                        child: Text(data[0]["image_path"]),
 
-                    ),
-                  );
+                      ),
+                    );
+//                  }
+
                 }),
               );
             }

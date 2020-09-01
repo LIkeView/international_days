@@ -6,6 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_admob/flutter_native_admob.dart';
 import 'package:flutter_native_admob/native_admob_controller.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'model/DayDetail.dart';
 import 'model/ads.dart';
@@ -42,7 +43,7 @@ class _monthState extends State<Month>{
   _monthState(String index){
     this.value = index;
   }
-  Future<String> getJsonData() async{
+  Future<String> _getMoreData() async{
     var url ="http://4foxwebsolution.com/festivals.com/api/getFestivals";
     print(url);
     FormData formData = new FormData.fromMap({
@@ -122,7 +123,7 @@ class _monthState extends State<Month>{
   Widget _adsContainer(){
     return
       Container(
-        height: 100,
+        height: 60,
         child: NativeAdmob(
           // Your ad unit id
           adUnitID: Ads[random.nextInt(4)],
@@ -132,160 +133,203 @@ class _monthState extends State<Month>{
         ),
       );
   }
-  Widget build(BuildContext context){
+  @override
+  Widget build(BuildContext context) {
     TextStyle defaultStyle = TextStyle(color: Colors.grey, fontSize: 20.0);
+    TextStyle linkStyle = TextStyle(color: Colors.blue);
     return
       SafeArea(
-      child: Scaffold(
-        body:FutureBuilder(
-          builder: (BuildContext context,AsyncSnapshot snapshot){
-            if(!snapshot.hasData){
-              return Center(
-                child:CircularProgressIndicator(),
-              );
-            }
-            else if(snapshot.hasError){
-              return Center(
-                child: Text(
-                  "Error",
-                ),
-              );
-            }
-            else if(snapshot.hasData){
-              return
-                new ListView.builder(
-                    itemCount: users == null ? 0 : users.length,
-                    itemBuilder: (BuildContext context, int index) {
-                if (index % 15 == 0 && index > 0) {
-                  return _adsContainer();
-                }
-                else {
-                      return new Container(
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25.0),
-                          ),
-                          margin: const EdgeInsets.all(10.0),
-                          color: colors[index],
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+        child: Scaffold(
+          body:FutureBuilder(
+            builder: (BuildContext context,AsyncSnapshot snapshot){
+              if(!snapshot.hasData){
+                return Center(
+                    child: SpinKitWave(color: Colors.black, type: SpinKitWaveType.center)
+                );
+                    }
+              else if(snapshot.hasError){
+                return Center(
+                  child: Text(
+                    "Error",
+                  ),
+                );
+              }
+              else if(snapshot.hasData){
+                return
+                  new ListView.builder(
+                      itemCount: users == null ? 0 : users.length,
+                      itemBuilder: (BuildContext context, int index) {
+//                        if (index % 5 == 0 && index > 0) {
+//                          return _adsContainer();
+//                        }
+//                        else {
+                        return new Container(
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                            margin: const EdgeInsets.all(5.0),
+                            child: new Row(
                               children: <Widget>[
                                 Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 8.0, bottom: 4.0),
-                                    child: Text(
-                                        users[index]["fes_name"], style: new TextStyle(
-                                        fontSize: 30.0, color: Colors.white)
-                                    )
+                                  padding: const EdgeInsets.only(top: 2.0, bottom: 4.0,left: 5.0),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Container(
+                                        child: new CircleAvatar(
+                                          child: Text(users[index]["m_date"][0],style: TextStyle(color: Colors.white),),
+                                          backgroundImage: new NetworkImage(url),
+                                          backgroundColor: Colors.black45,
+                                          radius: 24.0,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 4.0, bottom: 30.0),
-                                  child: Text(users[index]["m_date"],
-                                      style: new TextStyle(
-                                          fontSize: 20.0, color: Colors.white)),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 4.0, bottom: 4.0),
-                                  child: Text(users[index]["fes_cat"], maxLines: 2,
-                                      style: new TextStyle(
-                                          fontSize: 20.0, color: Colors.white)),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 8.0, bottom: 8.0),
-                                  child: Text("# Tag", style: new TextStyle(
-                                      fontSize: 22.0, color: Colors.white70),),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 8.0, bottom: 8.0),
-                                  child: Text(users[index]["tags"],
-                                    style: new TextStyle(
-                                      fontSize: 18.0, color: Colors.white,
-                                    ), maxLines: 2,),
-                                ),
-                                Padding(
+                                Expanded(
+                                  child: new Container(
+                                    padding: new EdgeInsets.only(left: 8.0),
+                                    child: new Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: <Widget>[
+                                        Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 30.0, bottom: 2.0),
+                                            child: Text(
+                                                users[index]["fes_name"], style: new TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 18.0,)
+                                            )
+                                        ),
 
-                                  padding: const EdgeInsets.only(
-                                      top: 0.0, bottom: 0.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                        children: <Widget>[
-                                          Ink(
-                                            child: IconButton(
-                                              color: Colors.white,
-                                              icon: Icon(Icons.image),
-                                              onPressed: () async {
-                                                newindex = users[index]
-                                                ["festival_id"]
-                                                    .toString();
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            FestImageView(
-                                                                newindex)));
-                                              },
-                                            ),
-                                          )
-                                        ],
-                                    )
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 0.0, bottom: 1.0),
+                                          child: Row(
+                                            children: <Widget>[
+//                                  Icon(Icons.person),
+                                              Text(users[index]["m_date"][0].toString().toUpperCase() + users[index]["m_date"].toString().substring(1),
+                                                style: new TextStyle(color: Colors.black,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 14.0,
 
-//                                  child: Row(
-//                                    children: <Widget>[
-//                                      RichText(
-//                                        text: TextSpan(
-//                                          style: defaultStyle,
-//                                          children: <TextSpan>[
+                                                ),
+
+                                              ),
+
+                                            ],
+                                          ),
+
+                                        ),
+
+
+                                        Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: .0, bottom: 30.0),
+                                            child: Text(users[index]["fes_cat"],
+                                              style: new TextStyle(color: Colors.black,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14.0,
+
+                                              ),
+
+                                            )
+                                        )
+
+
+//                              Padding(
+//                                padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+//                                child: Row(
+//                                  children: <Widget>[
+//                                    FaIcon(FontAwesomeIcons.whatsapp),
+//                                    RichText(
+//                                      text: TextSpan(
+//                                        style: defaultStyle,
+//                                        children: <TextSpan>[
 ////                                      TextSpan(text: 'By clicking Sign Up, you agree to our '),
-//                                            TextSpan(
-//                                                text: "View More",
-//                                                style: new TextStyle(
-//                                                    fontSize: 18.0,
-//                                                    color: Colors.white70),
-//                                                recognizer:
-//                                                TapGestureRecognizer()
-//                                                  ..onTap = () {
-//                                                    newindex = users[index]
-//                                                    ["festival_id"]
-//                                                        .toString();
-//                                                    Navigator.push(
-//                                                        context,
-//                                                        MaterialPageRoute(
-//                                                            builder: (context) =>
-//                                                                FestImageView(
-//                                                                    newindex)));
-//                                                  }),
-//                                          ],
-//                                        ),
+//                                          TextSpan(
+//                                            text: "  "+data[index]["wp_no"],
+//                                            style: new TextStyle(
+//                                              fontSize: 14.0,
+//
+//                                              color: Colors.grey,
+//                                            ),
+//                                            recognizer: TapGestureRecognizer()
+//                                              ..onTap = () async {
+//                                                await FlutterLaunch.launchWathsApp(phone: data[index]["wp_no"], message: "Hello");},
+//                                          ),
+//                                        ],
 //                                      ),
-//                                    ],
-//                                  ),
-                                ),
+//                                    ),
+//
+//                                  ],
+//                                ),
+//                              ),
 
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  child: new Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: <Widget>[
+                                      Ink(
+                                        child: IconButton(
+                                          color: Colors.black,
+                                          icon: Icon(Icons.image),
+                                          onPressed: () async {
+                                            newindex = users[index]
+                                            ["festival_id"]
+                                                .toString();
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        FestImageView(
+                                                            newindex)));
+                                          },
+                                        ),
+                                      )
+
+//                            new Text(
+//                              "9:50",
+//                              style: new TextStyle(
+//                                  color: Colors.lightGreen, fontSize: 12.0),
+//                            ),
+//                            new CircleAvatar(
+//                              backgroundColor: Colors.lightGreen,
+//                              radius: 10.0,
+//                              child: new Text(
+//                                "2",
+//                                style: new TextStyle(
+//                                    color: Colors.white, fontSize: 12.0),
+//                              ),
+//                            )
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                        ),
-                      );
+                        );
+//                        }
+                      }
+                  );
               }
-                    }
-                );
-            }
-          },
-          future: getJsonData(),
+            },
+            future: _getMoreData(),
+          ),
+          bottomNavigationBar: BottomAppBar(
+            child: _adsContainer(),
+          ),
+
+
+
+
         ),
-
-
-
-
-      ),
-    );
+      );
   }
 }
 
