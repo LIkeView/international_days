@@ -17,20 +17,22 @@ import 'package:flutter_native_admob/native_admob_controller.dart';
 import 'ads.dart';
 class FestImageView extends StatefulWidget {
   String index;
-
-  FestImageView(String newindex) {
+  String ImageFestName;
+  FestImageView(String newindex,String FestName) {
     this.index = newindex;
+    this.ImageFestName = FestName;
   }
 
   @override
-  _ImageState createState() => _ImageState(index);
+  _ImageState createState() => _ImageState(index,ImageFestName);
 }
 
 class _ImageState extends State<FestImageView> {
   String festival_id = "";
-
-  _ImageState(String festival_id) {
+  String Image_FestName = "";
+  _ImageState(String festival_id,String Image_FestName) {
     this.festival_id = festival_id;
+    this.Image_FestName = Image_FestName;
   }
 
   final String url = "http://4foxwebsolution.com/festivals.com/api/getImages";
@@ -73,26 +75,20 @@ class _ImageState extends State<FestImageView> {
       users = response.data['res_data']['image_details'];
     });
     return "Success";
+  }
 
+  Future<String> _getImageData() async {
 
-//    print(url);
-//
-//    var response = await http.post(
-//      // Encode the url
-//        Uri.encodeFull(url),
-//        body: {"festival_id": festival_id.toString()}
-//      //only accept json response
-//      //headers: {"Accept": "application/json"}
-//    );
-//    if (response.statusCode == 200) {
-//      print(response.body);
-//      setState(() {
-//        var convertDataToJson = json.decode(response.body);
-//        data = convertDataToJson["res_data"]["image_details"];
-////        image_details = convertDataToJson["res_data"]["image_details"][0]["image_path"];
-//      });
-//    }
-//    return "Success";
+    print(url);
+    FormData formData = new FormData.fromMap({
+      "festival_id": festival_id
+    });
+    final response = await dio.post(url, data: formData);
+    print(response.data);
+    setState(() {
+      users = response.data['res_data']['image_details'];
+    });
+    return "Success";
   }
 
   _showDialog(index) {
@@ -131,7 +127,8 @@ class _ImageState extends State<FestImageView> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text("Images"),
+        title:
+        Text(Image_FestName),
         centerTitle: true,
       ),
       body: FutureBuilder(
@@ -171,124 +168,69 @@ class _ImageState extends State<FestImageView> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          Dialog(
-                                            backgroundColor: Colors.black,
-                                            child: Column(
 
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: <Widget> [
-
-                                                Padding(
-                                                  padding: const EdgeInsets.only(
-                                                      top: 4.0, bottom: 4.0),
-                                                  child: Container(
-                                                      child: Image(
-                                                        image: NetworkImage(users[index]["image_path"]),
-                                                        fit: BoxFit.cover,
-                                                        width: MediaQuery.of(context).size.width,
-                                                      )
-                                                  ),
-                                                ),
-                                                Padding(
-                                                    padding: const EdgeInsets.only(
-                                                        top: 4.0, bottom: 4.0),
-                                                    child: Ink(
-                                                      child: IconButton(
-                                                        color: Colors.white,
-                                                        icon: Icon(Icons.share),
-                                                        onPressed: () async {
-                                                          var request = await HttpClient().getUrl(Uri.parse(users[index]["image_path"]));
-                                                          var response = await request.close();
-                                                          Uint8List bytes = await consolidateHttpClientResponseBytes(response);
-                                                          await Share.file('ESYS AMLOG', 'amlog.jpg', bytes, 'image/jpg');
-                                                        },
-                                                      ),
-                                                    )
-                                                ),
-
-
-                                              ],
-                                            ),
-                                          )
-//                                        Swiper(
+//                                  Swiper(
 //                                          itemBuilder: (BuildContext context, int newindex) {
 //                                            this.index = newindex;
-//                                            return   Container(
-//                                                   child: Column(
-//                                                     children: <Widget>[
-//                                                       Dialog(
-//                                                         child: Column(
-//                                                           children: <Widget> [
-//                                                             Center(
-//                                                                 child: Image(
-//                                                                   image: NetworkImage(data[index]["image_path"]),
-//                                                                   fit: BoxFit.cover,
-//                                                                   width: MediaQuery.of(context).size.width,
-//                                                                 )
-//                                                             ),
-//                                              Ink(
-//                                                child: IconButton(
-//                                                  icon: Icon(Icons.share),
-//                                                  onPressed: () async {
-//                                                    var request = await HttpClient().getUrl(Uri.parse(data[index]["image_path"]));
-//                                                    var response = await request.close();
-//                                                    Uint8List bytes = await consolidateHttpClientResponseBytes(response);
-//                                                    await Share.file('ESYS AMLOG', 'amlog.jpg', bytes, 'image/jpg');
-//                                                  },
-//                                                ),
-//                                              )
-//                                                           ],
-//                                                         ),
-//                                                       )
-////                                                       Image(
-////                                                         image: NetworkImage(
-////                                                             data[index]["image_path"]),
-////                                                         fit: BoxFit.cover,
-////                                                         width: MediaQuery.of(context).size.width,
-////                                                       )
-//                                                     ],
-//                                                   ),
-//                                            );
+                                             Container(
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment
+                                                    .center,
+                                                children: [
+                                                  Stack(
+                                                    children: <Widget>[
+                                                      new Container(
+                                                          padding: EdgeInsets
+                                                              .zero,
+                                                          child: Image(
+                                                            image: NetworkImage(
+                                                                users[index]["image_path"]),
+                                                            fit: BoxFit.cover,
+                                                            width: MediaQuery
+                                                                .of(context)
+                                                                .size
+                                                                .width,
+                                                          )
+                                                      ),
+                                                      Positioned(
+                                                        right: 5.0,
+                                                        bottom: 5.0,
+                                                        child: new FloatingActionButton(
+                                                          child: const Icon(
+                                                              Icons.share),
+                                                          backgroundColor: Colors
+                                                              .grey.shade800,
+                                                          onPressed: () async {
+                                                            var request = await HttpClient()
+                                                                .getUrl(
+                                                                Uri.parse(
+                                                                    users[index]["image_path"]));
+                                                            var response = await request
+                                                                .close();
+                                                            Uint8List bytes = await consolidateHttpClientResponseBytes(
+                                                                response);
+                                                            await Share.file(
+                                                                'ESYS AMLOG',
+                                                                'amlog.jpg',
+                                                                bytes,
+                                                                'image/jpg');
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
 //                                          },
 //                                          indicatorLayout: PageIndicatorLayout.COLOR,
-//                                          itemCount: data.length,
+//                                          itemCount: users.length,
 //                                          pagination: new SwiperPagination(),
 //                                          control: new SwiperControl(),
-//                                        )
-//                                        Dialog(
-//                                          child: Column(
-//                                              children: <Widget>[
-//                                                RaisedButton(
-//                                                  onPressed: () async {
-////                                                    await screenshotController.capture().then((image) async {
-//                                                      SocialShare.shareOptions("Hello world").then((data) {
-//                                                        print(data);
-//                                                      });
-////                                                    });
-//                                                  },
-//                                                  child: Text("Share Options"),
-//                                                ),
-//                                                Container(
-//                                                    child: Image(
-//                                                      image: NetworkImage(
-//                                                          data[index]["image_path"]),
-//                                                      height: 400,
-//                                                      fit: BoxFit.cover,
-//                                                      width: MediaQuery.of(context).size.width,
-//                                                    )),
-//                                          ]
-//                                        )
-//
-//
-//                                       child: Container(
-//                                          child: Image(
-//                                            image: NetworkImage(
-//                                                data[index]["image_path"]),
-//                                            fit: BoxFit.cover,
-//                                            width: MediaQuery.of(context).size.width,
-//                                          )),
-//                                )
-                                  ));
+//                                  )
+                                  ),
+
+                              );
                             },
 
                             child: Container(
@@ -297,7 +239,21 @@ class _ImageState extends State<FestImageView> {
 
                                 child: Image(
                                   image: NetworkImage(users[index]["image_path"]),
-                                  fit: BoxFit.cover,
+                                  loadingBuilder: (BuildContext context, Widget child,
+                                      ImageChunkEvent loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Center(
+                                        child: SpinKitWave(
+                                            color: Colors.black, size: 20, type: SpinKitWaveType.center,)
+//                                      child: CircularProgressIndicator(
+//                                        value: loadingProgress.expectedTotalBytes != null
+//                                            ? loadingProgress.cumulativeBytesLoaded /
+//                                            loadingProgress.expectedTotalBytes
+//                                            : null,
+//                                      ),
+                                    );
+                                  },
+//                                  fit: BoxFit.cover,
 //                    width: MediaQuery.of(context).size.width,
                                   height: MediaQuery
                                       .of(context)

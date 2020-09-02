@@ -144,7 +144,7 @@ class _monthState extends State<Month>{
             builder: (BuildContext context,AsyncSnapshot snapshot){
               if(!snapshot.hasData){
                 return Center(
-                    child: SpinKitWave(color: Colors.black, type: SpinKitWaveType.center)
+                    child: SpinKitWave(color: Colors.black,size: 30, type: SpinKitWaveType.center)
                 );
                     }
               else if(snapshot.hasError){
@@ -283,12 +283,16 @@ class _monthState extends State<Month>{
                                             newindex = users[index]
                                             ["festival_id"]
                                                 .toString();
+                                            String FestName;
+                                            FestName = users[index]
+                                            ["fes_name"]
+                                                .toString();
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
                                                         FestImageView(
-                                                            newindex)));
+                                                            newindex,FestName)));
                                           },
                                         ),
                                       )

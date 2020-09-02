@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:international_days/Today.dart';
+import 'package:search_page/search_page.dart';
 import 'Month.dart';
+
+class Person {
+  final String name, surname;
+  final num age;
+
+  Person(this.name, this.surname, this.age);
+}
 
 class NavHome extends StatefulWidget {
   @override
@@ -8,7 +16,17 @@ class NavHome extends StatefulWidget {
 }
 class _NavHomeState extends State<NavHome> {
   DateTime _dateTime;
-
+  static List<Person> people = [
+    Person('Mike', 'Barron', 1),
+    Person('Mike', 'Barron', 2),
+    Person('Todd', 'Black', 3),
+    Person('Ahmad', 'Edwards', 4),
+    Person('Anthony', 'Johnson', 5),
+    Person('Annette', 'Brooks', 6),
+    Person('Annette', 'Brooks', 7),
+    Person('Annette', 'Brooks', 8),
+    Person('dk', 'Brooks', 9),
+  ];
   @override
   List<Widget> containers = [
     Container(
@@ -52,7 +70,56 @@ class _NavHomeState extends State<NavHome> {
     )
   ];
 
+  Future _selectDate() async {
+    DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: new DateTime.now(),
+        firstDate: new DateTime(2016),
+        lastDate: new DateTime(2019)
+    );
+    String _value;
+    if(picked != null) setState(() => _value = picked.toString());
+  }
+
   Widget build(BuildContext context) {
+
+    void _showDialog() {
+      // flutter defined function
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            title: new Text("Search"),
+            content: InkWell(
+              onTap: () {
+                _selectDate();   // Call Function that has showDatePicker()
+              },
+              child: IgnorePointer(
+                child: new TextFormField(
+                  decoration: new InputDecoration(hintText: 'DOB'),
+                  maxLength: 10,
+                  // validator: validateDob,
+                  onSaved: (String val) {},
+                ),
+              ),
+            ),
+
+
+            actions: <Widget>[
+              // usually buttons at the bottom of the dialog
+              new FlatButton(
+                child: new Text("Close"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     return DefaultTabController(
       length: 13,
       child: Scaffold(
@@ -64,21 +131,12 @@ class _NavHomeState extends State<NavHome> {
             IconButton(
 
               icon: Icon(
-                Icons.calendar_today,
+                Icons.search,
                 color: Colors.white,
               ),
               onPressed: () {
                 // do something
-                showDatePicker(
-                    context: context,
-                    initialDate: _dateTime == null ? DateTime.now() : _dateTime,
-                    firstDate: DateTime(2001),
-                    lastDate: DateTime(2021)
-                ).then((date) {
-                  setState(() {
-                    _dateTime = date;
-                  });
-                });
+                _showDialog();
                 print("darshan");
                 print(_dateTime);
                 },
@@ -133,6 +191,35 @@ class _NavHomeState extends State<NavHome> {
         body: TabBarView(
           children: containers,
         ),
+        floatingActionButton: FloatingActionButton(
+          tooltip: 'Search people',
+          backgroundColor: Colors.black,
+          onPressed: () => showSearch(
+            context: context,
+            delegate: SearchPage<Person>(
+              items: people,
+              searchLabel: 'Search',
+              suggestion: Center(
+                child: Text('Search Clint by Clint Name, Clint Type'),
+              ),
+              failure: Center(
+                child: Text('No person found :('),
+              ),
+              filter: (person) => [
+                person.name,
+                person.surname,
+                person.age.toString(),
+              ],
+              builder: (person) => ListTile(
+                title: Text(person.name),
+//                subtitle: Text(person.surname),
+//                trailing: Text('${person.age} Year'),
+              ),
+            ),
+          ),
+          child: Icon(Icons.search),
+        ),
+
       ),
     );
 
