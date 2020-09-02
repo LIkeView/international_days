@@ -1,6 +1,7 @@
+
 import 'package:flutter/material.dart';
 import 'package:international_days/Today.dart';
-import 'package:search_page/search_page.dart';
+// import 'package:search_page/search_page.dart';
 import 'Month.dart';
 
 class Person {
@@ -27,6 +28,7 @@ class _NavHomeState extends State<NavHome> {
     Person('Annette', 'Brooks', 8),
     Person('dk', 'Brooks', 9),
   ];
+  DateTime _date = DateTime.now();
   @override
   List<Widget> containers = [
     Container(
@@ -70,15 +72,22 @@ class _NavHomeState extends State<NavHome> {
     )
   ];
 
-  Future _selectDate() async {
+  Future<Null> _selectDate(BuildContext context) async {
     DateTime picked = await showDatePicker(
         context: context,
         initialDate: new DateTime.now(),
         firstDate: new DateTime(2016),
-        lastDate: new DateTime(2019)
+        lastDate: new DateTime(2021),
+        textDirection: TextDirection.ltr,
+        initialDatePickerMode: DatePickerMode.day
     );
     String _value;
-    if(picked != null) setState(() => _value = picked.toString());
+    if(picked != null && picked!= _date) {
+        setState(() {
+          _date = picked;
+          print(_date.toString());
+        });
+    }
   }
 
   Widget build(BuildContext context) {
@@ -91,18 +100,21 @@ class _NavHomeState extends State<NavHome> {
           // return object of type Dialog
           return AlertDialog(
             title: new Text("Search"),
-            content: InkWell(
-              onTap: () {
-                _selectDate();   // Call Function that has showDatePicker()
-              },
-              child: IgnorePointer(
-                child: new TextFormField(
-                  decoration: new InputDecoration(hintText: 'DOB'),
-                  maxLength: 10,
-                  // validator: validateDob,
-                  onSaved: (String val) {},
-                ),
-              ),
+            content: Column(
+                children: <Widget>[
+                  new TextFormField(
+                    maxLength: 10,
+                    readOnly: true,
+                    // validator: validateDob,
+                    onTap: (){
+                      setState(() {
+                        _selectDate(context);
+                      });
+                    },
+                    decoration: new InputDecoration(hintText: (_date.toString())),
+                  ),
+                ],
+
             ),
 
 
@@ -191,34 +203,34 @@ class _NavHomeState extends State<NavHome> {
         body: TabBarView(
           children: containers,
         ),
-        floatingActionButton: FloatingActionButton(
-          tooltip: 'Search people',
-          backgroundColor: Colors.black,
-          onPressed: () => showSearch(
-            context: context,
-            delegate: SearchPage<Person>(
-              items: people,
-              searchLabel: 'Search',
-              suggestion: Center(
-                child: Text('Search Clint by Clint Name, Clint Type'),
-              ),
-              failure: Center(
-                child: Text('No person found :('),
-              ),
-              filter: (person) => [
-                person.name,
-                person.surname,
-                person.age.toString(),
-              ],
-              builder: (person) => ListTile(
-                title: Text(person.name),
-//                subtitle: Text(person.surname),
-//                trailing: Text('${person.age} Year'),
-              ),
-            ),
-          ),
-          child: Icon(Icons.search),
-        ),
+//         floatingActionButton: FloatingActionButton(
+//           tooltip: 'Search people',
+//           backgroundColor: Colors.black,
+//           onPressed: () => showSearch(
+//             context: context,
+//             delegate: SearchPage<Person>(
+//               items: people,
+//               searchLabel: 'Search',
+//               suggestion: Center(
+//                 child: Text('Search Clint by Clint Name, Clint Type'),
+//               ),
+//               failure: Center(
+//                 child: Text('No person found :('),
+//               ),
+//               filter: (person) => [
+//                 person.name,
+//                 person.surname,
+//                 person.age.toString(),
+//               ],
+//               builder: (person) => ListTile(
+//                 title: Text(person.name),
+// //                subtitle: Text(person.surname),
+// //                trailing: Text('${person.age} Year'),
+//               ),
+//             ),
+//           ),
+//           child: Icon(Icons.search),
+//         ),
 
       ),
     );

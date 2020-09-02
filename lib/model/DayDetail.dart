@@ -264,7 +264,6 @@ class _ImageState extends State<FestImageView> {
                             ),
                           )
 //                        child: Text(data[0]["image_path"]),
-
                       ),
                     );
 //                  }
