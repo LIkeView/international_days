@@ -45,12 +45,12 @@ class _monthState extends State<Month>{
   }
   Future<String> _getMoreData() async{
     var url ="http://4foxwebsolution.com/festivals.com/api/getFestivals";
-    print(url);
+//    print(url);
     FormData formData = new FormData.fromMap({
       "fest_id" : value
     });
     final response = await dio.post(url, data: formData);
-    print(response.data);
+//    print(response.data);
     setState(() {
       users = response.data['res_data']['festival_details'];
     });
@@ -126,7 +126,7 @@ class _monthState extends State<Month>{
         height: 60,
         child: NativeAdmob(
           // Your ad unit id
-          adUnitID: Ads[random.nextInt(4)],
+          adUnitID: "ca-app-pub-9549521101535952/4172064241",
           controller: _nativeAdController,
           type: NativeAdmobType.banner,
 //        error: CupertinoActivityIndicator(),
@@ -137,6 +137,10 @@ class _monthState extends State<Month>{
   Widget build(BuildContext context) {
     TextStyle defaultStyle = TextStyle(color: Colors.grey, fontSize: 20.0);
     TextStyle linkStyle = TextStyle(color: Colors.blue);
+    List colors = [
+      Colors.green, Colors.indigo,Colors.yellow,Colors.orange
+    ];
+    int colorIndex = 0;
     return
       SafeArea(
         child: Scaffold(
@@ -144,7 +148,7 @@ class _monthState extends State<Month>{
             builder: (BuildContext context,AsyncSnapshot snapshot){
               if(!snapshot.hasData){
                 return Center(
-                    child: SpinKitWave(color: Colors.black,size: 30, type: SpinKitWaveType.center)
+                    child: SpinKitFadingGrid(color: Colors.cyan,shape: BoxShape.rectangle)
                 );
                     }
               else if(snapshot.hasError){
@@ -159,83 +163,131 @@ class _monthState extends State<Month>{
                   new ListView.builder(
                       itemCount: users == null ? 0 : users.length,
                       itemBuilder: (BuildContext context, int index) {
+                        Random random = new Random();
+                        var baseColor = colors[colorIndex] as dynamic;
+                        Color color1 = baseColor[800];
+                        Color color2  = baseColor[400];
+                        colorIndex++;
+                        if(colorIndex == colors.length){
+                          colorIndex = 0;
+                        }
 //                        if (index % 5 == 0 && index > 0) {
 //                          return _adsContainer();
 //                        }
 //                        else {
                         return new Container(
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                            margin: const EdgeInsets.all(5.0),
-                            child: new Row(
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 2.0, bottom: 4.0,left: 5.0),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Container(
-                                        child: new CircleAvatar(
-                                          child: Text(users[index]["m_date"][0],style: TextStyle(color: Colors.white),),
-                                          backgroundImage: new NetworkImage(url),
-                                          backgroundColor: Colors.black45,
-                                          radius: 24.0,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                            child: GestureDetector(
+                            onTap: () async {
+                              newindex = users[index]
+                              ["festival_id"]
+                                  .toString();
+                              String FestName;
+                              FestName = users[index]
+                              ["fes_name"]
+                                  .toString();
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          FestImageView(
+                                              newindex,FestName)));
+                            },                              child: Card(
+
+//                            onPressed: () async {
+//                              newindex = users[index]
+//                              ["festival_id"]
+//                                  .toString();
+//                              String FestName;
+//                              FestName = users[index]
+//                              ["fes_name"]
+//                                  .toString();
+//                              Navigator.push(
+//                                  context,
+//                                  MaterialPageRoute(
+//                                      builder: (context) =>
+//                                          FestImageView(
+//                                              newindex,FestName)));
+//                            },
+
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
                                 ),
-                                Expanded(
-                                  child: new Container(
-                                    padding: new EdgeInsets.only(left: 8.0),
-                                    child: new Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      children: <Widget>[
-                                        Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 30.0, bottom: 2.0),
-                                            child: Text(
-                                                users[index]["fes_name"], style: new TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 18.0,)
-                                            )
-                                        ),
+                              margin: const EdgeInsets.only(top: 3.0, bottom: 3.0,left: 10,right: 10),
 
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 0.0, bottom: 1.0),
-                                          child: Row(
-                                            children: <Widget>[
-//                                  Icon(Icons.person),
-                                              Text(users[index]["m_date"][0].toString().toUpperCase() + users[index]["m_date"].toString().substring(1),
-                                                style: new TextStyle(color: Colors.black,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 14.0,
-
-                                                ),
-
-                                              ),
-
-                                            ],
+                                child: new Row(
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 2.0, bottom: 4.0,left: 15.0),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Container(
+                                            decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                gradient: LinearGradient(
+                                                    colors: [color1,color2],
+                                                    begin: Alignment.bottomLeft,
+                                                    end: Alignment.topRight
+                                                )
+                                            ),
+                                            child: new CircleAvatar(
+                                              child: Text(users[index]["date"][0]+users[index]["date"][1],style: TextStyle(color: Colors.white),),
+                                              backgroundColor: Colors.transparent,
+                                              radius: 24.0,
+                                            ),
                                           ),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: new Container(
+                                        padding: new EdgeInsets.only(left: 15.0),
+                                        child: new Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                          children: <Widget>[
+                                            Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 30.0, bottom: 2.0),
+                                                child: Text(
+                                                    users[index]["fes_name"], style: new TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 18.0,)
+                                                )
+                                            ),
 
-                                        ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 0.0, bottom: 1.0),
+                                              child: Row(
+                                                children: <Widget>[
+//                                  Icon(Icons.person),
+                                                  Text(users[index]["m_date"][0].toString().toUpperCase() + users[index]["m_date"].toString().substring(1),
+                                                    style: new TextStyle(color: Colors.black,
+                                                      fontWeight: FontWeight.w600,
+                                                      fontSize: 14.0,
 
+                                                    ),
 
-                                        Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: .0, bottom: 30.0),
-                                            child: Text(users[index]["fes_cat"],
-                                              style: new TextStyle(color: Colors.black,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 14.0,
+                                                  ),
 
+                                                ],
                                               ),
 
+                                            ),
+
+
+                                            Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: .0, bottom: 30.0),
+                                                child: Text(users[index]["fes_cat"],
+                                                  style: new TextStyle(color: Colors.black,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 14.0,
+
+                                                  ),
+
+                                                )
                                             )
-                                        )
 
 
 //                              Padding(
@@ -267,56 +319,57 @@ class _monthState extends State<Month>{
 //                                ),
 //                              ),
 
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  child: new Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: <Widget>[
-                                      Ink(
-                                        child: IconButton(
-                                          color: Colors.black,
-                                          icon: Icon(Icons.image),
-                                          onPressed: () async {
-                                            newindex = users[index]
-                                            ["festival_id"]
-                                                .toString();
-                                            String FestName;
-                                            FestName = users[index]
-                                            ["fes_name"]
-                                                .toString();
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        FestImageView(
-                                                            newindex,FestName)));
-                                          },
+                                          ],
                                         ),
-                                      )
-
-//                            new Text(
-//                              "9:50",
-//                              style: new TextStyle(
-//                                  color: Colors.lightGreen, fontSize: 12.0),
-//                            ),
-//                            new CircleAvatar(
-//                              backgroundColor: Colors.lightGreen,
-//                              radius: 10.0,
-//                              child: new Text(
-//                                "2",
-//                                style: new TextStyle(
-//                                    color: Colors.white, fontSize: 12.0),
-//                              ),
-//                            )
-                                    ],
-                                  ),
+                                      ),
+                                    ),
+//                                    Container(
+//                                      child: new Column(
+//                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+//                                        children: <Widget>[
+//                                          Ink(
+//                                            child: IconButton(
+//                                              icon: Icon(Icons.image),
+//                                              onPressed: () async {
+//                                                newindex = users[index]
+//                                                ["festival_id"]
+//                                                    .toString();
+//                                                String FestName;
+//                                                FestName = users[index]
+//                                                ["fes_name"]
+//                                                    .toString();
+//                                                Navigator.push(
+//                                                    context,
+//                                                    MaterialPageRoute(
+//                                                        builder: (context) =>
+//                                                            FestImageView(
+//                                                                newindex,FestName)));
+//                                              },
+//                                            ),
+//                                          )
+//
+////                            new Text(
+////                              "9:50",
+////                              style: new TextStyle(
+////                                  color: Colors.lightGreen, fontSize: 12.0),
+////                            ),
+////                            new CircleAvatar(
+////                              backgroundColor: Colors.lightGreen,
+////                              radius: 10.0,
+////                              child: new Text(
+////                                "2",
+////                                style: new TextStyle(
+////                                    color: Colors.white, fontSize: 12.0),
+////                              ),
+////                            )
+//                                        ],
+//                                      ),
+//                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
+
                         );
 //                        }
                       }

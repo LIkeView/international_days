@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:gradient_app_bar/gradient_app_bar.dart';
 import 'package:international_days/Today.dart';
 // import 'package:search_page/search_page.dart';
 import 'Month.dart';
@@ -135,8 +136,9 @@ class _NavHomeState extends State<NavHome> {
     return DefaultTabController(
       length: 13,
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.black,
+        appBar: GradientAppBar(
+          backgroundColorStart: Colors.cyan,
+          backgroundColorEnd: Colors.indigo,
           centerTitle: true,
           title: Text("International Days"),
           actions: <Widget>[

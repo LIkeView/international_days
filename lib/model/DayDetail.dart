@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -13,6 +14,7 @@ import 'package:flutter_page_indicator/flutter_page_indicator.dart';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter_native_admob/flutter_native_admob.dart';
 import 'package:flutter_native_admob/native_admob_controller.dart';
+import 'package:gradient_app_bar/gradient_app_bar.dart';
 
 import 'ads.dart';
 class FestImageView extends StatefulWidget {
@@ -21,6 +23,8 @@ class FestImageView extends StatefulWidget {
   FestImageView(String newindex,String FestName) {
     this.index = newindex;
     this.ImageFestName = FestName;
+    bool isLoading = true;
+
   }
 
   @override
@@ -30,6 +34,8 @@ class FestImageView extends StatefulWidget {
 class _ImageState extends State<FestImageView> {
   String festival_id = "";
   String Image_FestName = "";
+  bool isLoading = true;
+
   _ImageState(String festival_id,String Image_FestName) {
     this.festival_id = festival_id;
     this.Image_FestName = Image_FestName;
@@ -65,12 +71,12 @@ class _ImageState extends State<FestImageView> {
 
   Future<String> _getMoreData() async {
 
-    print(url);
+//    print(url);
     FormData formData = new FormData.fromMap({
       "festival_id": festival_id
     });
     final response = await dio.post(url, data: formData);
-    print(response.data);
+//    print(response.data);
     setState(() {
       users = response.data['res_data']['image_details'];
     });
@@ -79,12 +85,12 @@ class _ImageState extends State<FestImageView> {
 
   Future<String> _getImageData() async {
 
-    print(url);
+//    print(url);
     FormData formData = new FormData.fromMap({
       "festival_id": festival_id
     });
     final response = await dio.post(url, data: formData);
-    print(response.data);
+//    print(response.data);
     setState(() {
       users = response.data['res_data']['image_details'];
     });
@@ -114,7 +120,8 @@ class _ImageState extends State<FestImageView> {
         height: 60,
         child: NativeAdmob(
           // Your ad unit id
-          adUnitID: Ads[random.nextInt(4)],
+          adUnitID: "ca-app-pub-9549521101535952/8584461283",
+
           controller: _nativeAdController,
           type: NativeAdmobType.banner,
 //        error: CupertinoActivityIndicator(),
@@ -125,24 +132,21 @@ class _ImageState extends State<FestImageView> {
   Widget build(BuildContext context) {
 //    print("Hello"+image_details);
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title:
-        Text(Image_FestName),
+      appBar: GradientAppBar(
+        title: Text(Image_FestName),
         centerTitle: true,
+        backgroundColorStart: Colors.cyan,
+        backgroundColorEnd: Colors.indigo,
       ),
       body: FutureBuilder(
           builder: (BuildContext context, AsyncSnapshot snapshot) {
+
             if (!snapshot.hasData) {
               return Center(
-                  child: SpinKitSquareCircle(
-                    color: Colors.black,
-                    size: 50.0,
-
-//                      controller: AnimationController(vsync: this, duration: const Duration(milliseconds: 1200)
-                      )
-                  );
-            } else if (snapshot.hasError) {
+                  child: SpinKitFadingGrid(color: Colors.cyan,shape: BoxShape.rectangle)
+              );
+            }
+            else if (snapshot.hasError) {
               return Center(
                 child: Text(
                   "Error",
@@ -154,7 +158,7 @@ class _ImageState extends State<FestImageView> {
                 scrollDirection: Axis.vertical,
                 children:
                 List.generate(users == null ? 0 : users.length, (index) {
-                  print("Image1 : " + users[0]["image_path"]);
+//                  print("Image1 : " + users[0]["image_path"]);
 
 //                  if(users[index]["image_path"]=null){
 //                    CircularProgressIndicator();
@@ -243,8 +247,8 @@ class _ImageState extends State<FestImageView> {
                                       ImageChunkEvent loadingProgress) {
                                     if (loadingProgress == null) return child;
                                     return Center(
-                                        child: SpinKitWave(
-                                            color: Colors.black, size: 20, type: SpinKitWaveType.center,)
+                                        child: SpinKitFadingGrid(color: Colors.cyan,shape: BoxShape.rectangle,size: 20,)
+
 //                                      child: CircularProgressIndicator(
 //                                        value: loadingProgress.expectedTotalBytes != null
 //                                            ? loadingProgress.cumulativeBytesLoaded /
