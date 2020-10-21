@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:dio/dio.dart';
@@ -24,7 +25,20 @@ class Month extends StatefulWidget {
   @override
   _monthState createState() => _monthState(index);
 }
+class Debouncer {
+  final int milliseconds;
+  VoidCallback action;
+  Timer _timer;
 
+  Debouncer({this.milliseconds});
+
+  run(VoidCallback action) {
+    if (null != _timer) {
+      _timer.cancel();
+    }
+    _timer = Timer(Duration(milliseconds: milliseconds), action);
+  }
+}
 class _monthState extends State<Month>{
 //  static const _adUnitID = "ca-app-pub-8592144969637455/8186518809";
 //  final _nativeAd = NativeAdmob();
@@ -38,13 +52,19 @@ class _monthState extends State<Month>{
   bool isLoading = false;
   final _nativeAdController = NativeAdmobController();
   List users = new List();
+  List filteredUser = new List();
+  final _debouncer = Debouncer(milliseconds: 500);
+  TextEditingController controller = new TextEditingController();
+  int newoneindex =0;
+
+
 
 
   _monthState(String index){
-    this.value = index;
-  }
-  Future<String> _getMoreData() async{
-    var url ="http://4foxwebsolution.com/festivals.com/api/getFestivals";
+      this.value = index;
+    }
+    Future<String> _getMoreData() async{
+      var url ="http://4foxwebsolution.com/festivals.com/api/getFestivals";
 //    print(url);
     FormData formData = new FormData.fromMap({
       "fest_id" : value
@@ -53,6 +73,7 @@ class _monthState extends State<Month>{
 //    print(response.data);
     setState(() {
       users = response.data['res_data']['festival_details'];
+      filteredUser = users;
     });
     return "Success";
   }
@@ -159,221 +180,475 @@ class _monthState extends State<Month>{
                 );
               }
               else if(snapshot.hasData){
-                return
-                  new ListView.builder(
-                      itemCount: users == null ? 0 : users.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        Random random = new Random();
-                        var baseColor = colors[colorIndex] as dynamic;
-                        Color color1 = baseColor[800];
-                        Color color2  = baseColor[400];
-                        colorIndex++;
-                        if(colorIndex == colors.length){
-                          colorIndex = 0;
-                        }
-//                        if (index % 5 == 0 && index > 0) {
-//                          return _adsContainer();
-//                        }
-//                        else {
-                        return new Container(
-                            child: GestureDetector(
-                            onTap: () async {
-                              newindex = users[index]
-                              ["festival_id"]
-                                  .toString();
-                              String FestName;
-                              FestName = users[index]
-                              ["fes_name"]
-                                  .toString();
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          FestImageView(
-                                              newindex,FestName)));
-                            },                              child: Card(
+                return Column(
+                  children: [
+                new Padding(
+                padding: const EdgeInsets.all(8.0),
+              child: new Card(
+              child: new ListTile(
+              leading: new Icon(Icons.search),
+              title: new TextField(
+                controller: controller,
+                decoration: new InputDecoration(
+                    hintText: 'Search', border: InputBorder.none),
+                onChanged:(String text) {
+                  filteredUser.clear();
+                  if (text.isEmpty) {
+                    setState(() {});
+                    return;
+                  }
+                  for(int i = newoneindex; i< filteredUser.length;i++) {
+                    (filteredUser[i]["fes_name"].contains(text));
+                      // filteredUser.add(userDetail);
+                  };
+                  setState(() {});
 
-//                            onPressed: () async {
-//                              newindex = users[index]
-//                              ["festival_id"]
-//                                  .toString();
-//                              String FestName;
-//                              FestName = users[index]
-//                              ["fes_name"]
-//                                  .toString();
-//                              Navigator.push(
-//                                  context,
-//                                  MaterialPageRoute(
-//                                      builder: (context) =>
-//                                          FestImageView(
-//                                              newindex,FestName)));
-//                            },
+                },
+              ),
+              trailing: new IconButton(icon: new Icon(Icons.cancel), onPressed: () {
+              controller.clear();
+              },),
+              ),
+              ),
+              ),
+                    Expanded(
+                    child:
+                    // filteredUser.length != 0 || controller.text.isNotEmpty?
+                    new      ListView.builder(
+                      itemCount: filteredUser == null ? 0 : filteredUser.length,
 
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                ),
-                              margin: const EdgeInsets.only(top: 3.0, bottom: 3.0,left: 10,right: 10),
+                      itemBuilder: (BuildContext context, int index ) {
+                        this.newoneindex=index;
+                      Random random = new Random();
+                      var baseColor = colors[colorIndex] as dynamic;
+                      Color color1 = baseColor[800];
+                      Color color2  = baseColor[400];
+                      colorIndex++;
+                      if(colorIndex == colors.length){
+                        colorIndex = 0;
+                      }
+                      //                        if (index % 5 == 0 && index > 0) {
+                      //                          return _adsContainer();
+                      //                        }
+                      //                        else {
+                      return new Container(
+                        child: GestureDetector(
+                          onTap: () async {
+                            newindex = filteredUser[index]
+                            ["festival_id"]
+                                .toString();
+                            String FestName;
+                            FestName = filteredUser[index]
+                            ["fes_name"]
+                                .toString();
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        FestImageView(
+                                            newindex,FestName)));
+                          },                              child: Card(
 
-                                child: new Row(
+                          //                            onPressed: () async {
+                          //                              newindex = users[index]
+                          //                              ["festival_id"]
+                          //                                  .toString();
+                          //                              String FestName;
+                          //                              FestName = users[index]
+                          //                              ["fes_name"]
+                          //                                  .toString();
+                          //                              Navigator.push(
+                          //                                  context,
+                          //                                  MaterialPageRoute(
+                          //                                      builder: (context) =>
+                          //                                          FestImageView(
+                          //                                              newindex,FestName)));
+                          //                            },
+
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          margin: const EdgeInsets.only(top: 3.0, bottom: 3.0,left: 10,right: 10),
+
+                          child: new Row(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2.0, bottom: 4.0,left: 15.0),
+                                child: Row(
                                   children: <Widget>[
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 2.0, bottom: 4.0,left: 15.0),
-                                      child: Row(
-                                        children: <Widget>[
-                                          Container(
-                                            decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                gradient: LinearGradient(
-                                                    colors: [color1,color2],
-                                                    begin: Alignment.bottomLeft,
-                                                    end: Alignment.topRight
-                                                )
-                                            ),
-                                            child: new CircleAvatar(
-                                              child: Text(users[index]["date"][0]+users[index]["date"][1],style: TextStyle(color: Colors.white),),
-                                              backgroundColor: Colors.transparent,
-                                              radius: 24.0,
-                                            ),
-                                          ),
-                                        ],
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          gradient: LinearGradient(
+                                              colors: [color1,color2],
+                                              begin: Alignment.bottomLeft,
+                                              end: Alignment.topRight
+                                          )
+                                      ),
+                                      child: new CircleAvatar(
+                                        child: Text(filteredUser[index]["date"][0]+filteredUser[index]["date"][1],style: TextStyle(color: Colors.white),),
+                                        backgroundColor: Colors.transparent,
+                                        radius: 24.0,
                                       ),
                                     ),
-                                    Expanded(
-                                      child: new Container(
-                                        padding: new EdgeInsets.only(left: 15.0),
-                                        child: new Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: new Container(
+                                  padding: new EdgeInsets.only(left: 15.0),
+                                  child: new Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: <Widget>[
+                                      Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 30.0, bottom: 2.0),
+                                          child: Text(
+                                              filteredUser[index]["fes_name"], style: new TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 18.0,)
+                                          )
+                                      ),
+
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 0.0, bottom: 1.0),
+                                        child: Row(
                                           children: <Widget>[
-                                            Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 30.0, bottom: 2.0),
-                                                child: Text(
-                                                    users[index]["fes_name"], style: new TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 18.0,)
-                                                )
-                                            ),
+                                            //                                  Icon(Icons.person),
+                                            Text(filteredUser[index]["m_date"][0].toString().toUpperCase() + filteredUser[index]["m_date"].toString().substring(1),
+                                              style: new TextStyle(color: Colors.black,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14.0,
 
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 0.0, bottom: 1.0),
-                                              child: Row(
-                                                children: <Widget>[
-//                                  Icon(Icons.person),
-                                                  Text(users[index]["m_date"][0].toString().toUpperCase() + users[index]["m_date"].toString().substring(1),
-                                                    style: new TextStyle(color: Colors.black,
-                                                      fontWeight: FontWeight.w600,
-                                                      fontSize: 14.0,
-
-                                                    ),
-
-                                                  ),
-
-                                                ],
                                               ),
 
                                             ),
 
-
-                                            Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: .0, bottom: 30.0),
-                                                child: Text(users[index]["fes_cat"],
-                                                  style: new TextStyle(color: Colors.black,
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 14.0,
-
-                                                  ),
-
-                                                )
-                                            )
-
-
-//                              Padding(
-//                                padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
-//                                child: Row(
-//                                  children: <Widget>[
-//                                    FaIcon(FontAwesomeIcons.whatsapp),
-//                                    RichText(
-//                                      text: TextSpan(
-//                                        style: defaultStyle,
-//                                        children: <TextSpan>[
-////                                      TextSpan(text: 'By clicking Sign Up, you agree to our '),
-//                                          TextSpan(
-//                                            text: "  "+data[index]["wp_no"],
-//                                            style: new TextStyle(
-//                                              fontSize: 14.0,
-//
-//                                              color: Colors.grey,
-//                                            ),
-//                                            recognizer: TapGestureRecognizer()
-//                                              ..onTap = () async {
-//                                                await FlutterLaunch.launchWathsApp(phone: data[index]["wp_no"], message: "Hello");},
-//                                          ),
-//                                        ],
-//                                      ),
-//                                    ),
-//
-//                                  ],
-//                                ),
-//                              ),
-
                                           ],
                                         ),
+
                                       ),
-                                    ),
-//                                    Container(
-//                                      child: new Column(
-//                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                                        children: <Widget>[
-//                                          Ink(
-//                                            child: IconButton(
-//                                              icon: Icon(Icons.image),
-//                                              onPressed: () async {
-//                                                newindex = users[index]
-//                                                ["festival_id"]
-//                                                    .toString();
-//                                                String FestName;
-//                                                FestName = users[index]
-//                                                ["fes_name"]
-//                                                    .toString();
-//                                                Navigator.push(
-//                                                    context,
-//                                                    MaterialPageRoute(
-//                                                        builder: (context) =>
-//                                                            FestImageView(
-//                                                                newindex,FestName)));
-//                                              },
-//                                            ),
-//                                          )
-//
-////                            new Text(
-////                              "9:50",
-////                              style: new TextStyle(
-////                                  color: Colors.lightGreen, fontSize: 12.0),
-////                            ),
-////                            new CircleAvatar(
-////                              backgroundColor: Colors.lightGreen,
-////                              radius: 10.0,
-////                              child: new Text(
-////                                "2",
-////                                style: new TextStyle(
-////                                    color: Colors.white, fontSize: 12.0),
-////                              ),
-////                            )
-//                                        ],
-//                                      ),
-//                                    ),
-                                  ],
+
+
+                                      Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: .0, bottom: 30.0),
+                                          child: Text(filteredUser[index]["fes_cat"],
+                                            style: new TextStyle(color: Colors.black,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14.0,
+
+                                            ),
+
+                                          )
+                                      )
+
+
+                                      //                              Padding(
+                                      //                                padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                                      //                                child: Row(
+                                      //                                  children: <Widget>[
+                                      //                                    FaIcon(FontAwesomeIcons.whatsapp),
+                                      //                                    RichText(
+                                      //                                      text: TextSpan(
+                                      //                                        style: defaultStyle,
+                                      //                                        children: <TextSpan>[
+                                      ////                                      TextSpan(text: 'By clicking Sign Up, you agree to our '),
+                                      //                                          TextSpan(
+                                      //                                            text: "  "+data[index]["wp_no"],
+                                      //                                            style: new TextStyle(
+                                      //                                              fontSize: 14.0,
+                                      //
+                                      //                                              color: Colors.grey,
+                                      //                                            ),
+                                      //                                            recognizer: TapGestureRecognizer()
+                                      //                                              ..onTap = () async {
+                                      //                                                await FlutterLaunch.launchWathsApp(phone: data[index]["wp_no"], message: "Hello");},
+                                      //                                          ),
+                                      //                                        ],
+                                      //                                      ),
+                                      //                                    ),
+                                      //
+                                      //                                  ],
+                                      //                                ),
+                                      //                              ),
+
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
+                              //                                    Container(
+                              //                                      child: new Column(
+                              //                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              //                                        children: <Widget>[
+                              //                                          Ink(
+                              //                                            child: IconButton(
+                              //                                              icon: Icon(Icons.image),
+                              //                                              onPressed: () async {
+                              //                                                newindex = users[index]
+                              //                                                ["festival_id"]
+                              //                                                    .toString();
+                              //                                                String FestName;
+                              //                                                FestName = users[index]
+                              //                                                ["fes_name"]
+                              //                                                    .toString();
+                              //                                                Navigator.push(
+                              //                                                    context,
+                              //                                                    MaterialPageRoute(
+                              //                                                        builder: (context) =>
+                              //                                                            FestImageView(
+                              //                                                                newindex,FestName)));
+                              //                                              },
+                              //                                            ),
+                              //                                          )
+                              //
+                              ////                            new Text(
+                              ////                              "9:50",
+                              ////                              style: new TextStyle(
+                              ////                                  color: Colors.lightGreen, fontSize: 12.0),
+                              ////                            ),
+                              ////                            new CircleAvatar(
+                              ////                              backgroundColor: Colors.lightGreen,
+                              ////                              radius: 10.0,
+                              ////                              child: new Text(
+                              ////                                "2",
+                              ////                                style: new TextStyle(
+                              ////                                    color: Colors.white, fontSize: 12.0),
+                              ////                              ),
+                              ////                            )
+                              //                                        ],
+                              //                                      ),
+                              //                                    ),
+                            ],
+                          ),
+                        ),
+                        ),
 
-                        );
-//                        }
-                      }
-                  );
+                      );
+                      //                        }
+                    }
+                )
+                    //     :ListView.builder(
+                    //     itemCount: users == null ? 0 : users.length,
+                    //     itemBuilder: (BuildContext context, int index) {
+                    //       Random random = new Random();
+                    //       var baseColor = colors[colorIndex] as dynamic;
+                    //       Color color1 = baseColor[800];
+                    //       Color color2  = baseColor[400];
+                    //       colorIndex++;
+                    //       if(colorIndex == colors.length){
+                    //         colorIndex = 0;
+                    //       }
+                    //       //                        if (index % 5 == 0 && index > 0) {
+                    //       //                          return _adsContainer();
+                    //       //                        }
+                    //       //                        else {
+                    //       return new Container(
+                    //         child: GestureDetector(
+                    //           onTap: () async {
+                    //             newindex = users[index]
+                    //             ["festival_id"]
+                    //                 .toString();
+                    //             String FestName;
+                    //             FestName = users[index]
+                    //             ["fes_name"]
+                    //                 .toString();
+                    //             Navigator.push(
+                    //                 context,
+                    //                 MaterialPageRoute(
+                    //                     builder: (context) =>
+                    //                         FestImageView(
+                    //                             newindex,FestName)));
+                    //           },                              child: Card(
+                    //
+                    //           //                            onPressed: () async {
+                    //           //                              newindex = users[index]
+                    //           //                              ["festival_id"]
+                    //           //                                  .toString();
+                    //           //                              String FestName;
+                    //           //                              FestName = users[index]
+                    //           //                              ["fes_name"]
+                    //           //                                  .toString();
+                    //           //                              Navigator.push(
+                    //           //                                  context,
+                    //           //                                  MaterialPageRoute(
+                    //           //                                      builder: (context) =>
+                    //           //                                          FestImageView(
+                    //           //                                              newindex,FestName)));
+                    //           //                            },
+                    //
+                    //           shape: RoundedRectangleBorder(
+                    //             borderRadius: BorderRadius.circular(5.0),
+                    //           ),
+                    //           margin: const EdgeInsets.only(top: 3.0, bottom: 3.0,left: 10,right: 10),
+                    //
+                    //           child: new Row(
+                    //             children: <Widget>[
+                    //               Padding(
+                    //                 padding: const EdgeInsets.only(top: 2.0, bottom: 4.0,left: 15.0),
+                    //                 child: Row(
+                    //                   children: <Widget>[
+                    //                     Container(
+                    //                       decoration: BoxDecoration(
+                    //                           shape: BoxShape.circle,
+                    //                           gradient: LinearGradient(
+                    //                               colors: [color1,color2],
+                    //                               begin: Alignment.bottomLeft,
+                    //                               end: Alignment.topRight
+                    //                           )
+                    //                       ),
+                    //                       child: new CircleAvatar(
+                    //                         child: Text(users[index]["date"][0]+users[index]["date"][1],style: TextStyle(color: Colors.white),),
+                    //                         backgroundColor: Colors.transparent,
+                    //                         radius: 24.0,
+                    //                       ),
+                    //                     ),
+                    //                   ],
+                    //                 ),
+                    //               ),
+                    //               Expanded(
+                    //                 child: new Container(
+                    //                   padding: new EdgeInsets.only(left: 15.0),
+                    //                   child: new Column(
+                    //                     crossAxisAlignment: CrossAxisAlignment.start,
+                    //                     mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    //                     children: <Widget>[
+                    //                       Padding(
+                    //                           padding: const EdgeInsets.only(
+                    //                               top: 30.0, bottom: 2.0),
+                    //                           child: Text(
+                    //                               users[index]["fes_name"], style: new TextStyle(
+                    //                             color: Colors.black,
+                    //                             fontWeight: FontWeight.w600,
+                    //                             fontSize: 18.0,)
+                    //                           )
+                    //                       ),
+                    //
+                    //                       Padding(
+                    //                         padding: const EdgeInsets.only(top: 0.0, bottom: 1.0),
+                    //                         child: Row(
+                    //                           children: <Widget>[
+                    //                             //                                  Icon(Icons.person),
+                    //                             Text(users[index]["m_date"][0].toString().toUpperCase() + users[index]["m_date"].toString().substring(1),
+                    //                               style: new TextStyle(color: Colors.black,
+                    //                                 fontWeight: FontWeight.w600,
+                    //                                 fontSize: 14.0,
+                    //
+                    //                               ),
+                    //
+                    //                             ),
+                    //
+                    //                           ],
+                    //                         ),
+                    //
+                    //                       ),
+                    //
+                    //
+                    //                       Padding(
+                    //                           padding: const EdgeInsets.only(
+                    //                               top: .0, bottom: 30.0),
+                    //                           child: Text(users[index]["fes_cat"],
+                    //                             style: new TextStyle(color: Colors.black,
+                    //                               fontWeight: FontWeight.w600,
+                    //                               fontSize: 14.0,
+                    //
+                    //                             ),
+                    //
+                    //                           )
+                    //                       )
+                    //
+                    //
+                    //                       //                              Padding(
+                    //                       //                                padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                    //                       //                                child: Row(
+                    //                       //                                  children: <Widget>[
+                    //                       //                                    FaIcon(FontAwesomeIcons.whatsapp),
+                    //                       //                                    RichText(
+                    //                       //                                      text: TextSpan(
+                    //                       //                                        style: defaultStyle,
+                    //                       //                                        children: <TextSpan>[
+                    //                       ////                                      TextSpan(text: 'By clicking Sign Up, you agree to our '),
+                    //                       //                                          TextSpan(
+                    //                       //                                            text: "  "+data[index]["wp_no"],
+                    //                       //                                            style: new TextStyle(
+                    //                       //                                              fontSize: 14.0,
+                    //                       //
+                    //                       //                                              color: Colors.grey,
+                    //                       //                                            ),
+                    //                       //                                            recognizer: TapGestureRecognizer()
+                    //                       //                                              ..onTap = () async {
+                    //                       //                                                await FlutterLaunch.launchWathsApp(phone: data[index]["wp_no"], message: "Hello");},
+                    //                       //                                          ),
+                    //                       //                                        ],
+                    //                       //                                      ),
+                    //                       //                                    ),
+                    //                       //
+                    //                       //                                  ],
+                    //                       //                                ),
+                    //                       //                              ),
+                    //
+                    //                     ],
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //               //                                    Container(
+                    //               //                                      child: new Column(
+                    //               //                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    //               //                                        children: <Widget>[
+                    //               //                                          Ink(
+                    //               //                                            child: IconButton(
+                    //               //                                              icon: Icon(Icons.image),
+                    //               //                                              onPressed: () async {
+                    //               //                                                newindex = users[index]
+                    //               //                                                ["festival_id"]
+                    //               //                                                    .toString();
+                    //               //                                                String FestName;
+                    //               //                                                FestName = users[index]
+                    //               //                                                ["fes_name"]
+                    //               //                                                    .toString();
+                    //               //                                                Navigator.push(
+                    //               //                                                    context,
+                    //               //                                                    MaterialPageRoute(
+                    //               //                                                        builder: (context) =>
+                    //               //                                                            FestImageView(
+                    //               //                                                                newindex,FestName)));
+                    //               //                                              },
+                    //               //                                            ),
+                    //               //                                          )
+                    //               //
+                    //               ////                            new Text(
+                    //               ////                              "9:50",
+                    //               ////                              style: new TextStyle(
+                    //               ////                                  color: Colors.lightGreen, fontSize: 12.0),
+                    //               ////                            ),
+                    //               ////                            new CircleAvatar(
+                    //               ////                              backgroundColor: Colors.lightGreen,
+                    //               ////                              radius: 10.0,
+                    //               ////                              child: new Text(
+                    //               ////                                "2",
+                    //               ////                                style: new TextStyle(
+                    //               ////                                    color: Colors.white, fontSize: 12.0),
+                    //               ////                              ),
+                    //               ////                            )
+                    //               //                                        ],
+                    //               //                                      ),
+                    //               //                                    ),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //         ),
+                    //
+                    //       );
+                    //       //                        }
+                    //     }
+                    // )
+
+                  ),
+
+              ],
+                );
               }
             },
             future: _getMoreData(),
@@ -381,13 +656,11 @@ class _monthState extends State<Month>{
           bottomNavigationBar: BottomAppBar(
             child: _adsContainer(),
           ),
-
-
-
-
         ),
       );
   }
+
 }
+
 
 
