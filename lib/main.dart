@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:international_days/MainScreen.dart';
+import 'package:international_days/MainScreen/home_screen.dart';
 
 import 'NavHome.dart';
 
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
 //        primarySwatch: Colors.blue,
 //        visualDensity: VisualDensity.adaptivePlatformDensity,
 //      ),
-      home: NavHome(),
+      home: HomeScreen(),
     );
   }
 }

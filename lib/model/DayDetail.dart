@@ -41,7 +41,7 @@ class _ImageState extends State<FestImageView> {
     this.Image_FestName = Image_FestName;
   }
 
-  final String url = "http://4foxwebsolution.com/festivals.com/api/getImages";
+  final String url = "http://festivel.likeview.in/api/getImages";
 //  List data;
   List users = new List();
 
@@ -108,7 +108,7 @@ class _ImageState extends State<FestImageView> {
               decoration: BoxDecoration(
                   image: DecorationImage(
                       image: ExactAssetImage(users[index]["image_path"]),
-                      fit: BoxFit.cover)),
+                      fit: BoxFit.cover,)),
             ),
           );
         });
@@ -143,7 +143,8 @@ class _ImageState extends State<FestImageView> {
 
             if (!snapshot.hasData) {
               return Center(
-                  child: SpinKitFadingGrid(color: Colors.cyan,shape: BoxShape.rectangle)
+                child: Text("Image Not Found"),
+//                  child: SpinKitFadingGrid(color: Colors.cyan,shape: BoxShape.rectangle)
               );
             }
             else if (snapshot.hasError) {
@@ -188,7 +189,8 @@ class _ImageState extends State<FestImageView> {
                                                               .zero,
                                                           child: Image(
                                                             image: NetworkImage(
-                                                                users[index]["image_path"]),
+                                                                users[index]["image_path"],scale: 0.8),
+
                                                             fit: BoxFit.cover,
                                                             width: MediaQuery
                                                                 .of(context)
@@ -242,7 +244,8 @@ class _ImageState extends State<FestImageView> {
 //                                borderRadius: BorderRadius.circular(20.0),
 
                                 child: Image(
-                                  image: NetworkImage(users[index]["image_path"]),
+
+                                  image: NetworkImage(users[index]["image_path"],),
                                   loadingBuilder: (BuildContext context, Widget child,
                                       ImageChunkEvent loadingProgress) {
                                     if (loadingProgress == null) return child;

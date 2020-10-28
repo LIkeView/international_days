@@ -19,7 +19,7 @@ class _todayState extends State<Today> {
   final dio = new Dio();
   String newindex = "";
   final _nativeAdController = NativeAdmobController();
-  var url ="http://4foxwebsolution.com/festivals.com/api/getTodayData";
+  var url ="http://festivel.likeview.in/api/getTodayData";
 
   @override
   void initState() {
@@ -103,6 +103,7 @@ int colorIndex = 0;
 //                        }
 //                        else {
                           return new Container(
+
                               child: GestureDetector(
                                 onTap: () async {
                                   newindex = users[index]
@@ -118,7 +119,8 @@ int colorIndex = 0;
                                           builder: (context) =>
                                               FestImageView(
                                                   newindex,FestName)));
-                                },                                child: Card(
+                                },
+                                child: Card(
                                 margin: const EdgeInsets.only(top: 3.0, bottom: 3.0,left: 10,right: 10),
 
                                 shape: RoundedRectangleBorder(

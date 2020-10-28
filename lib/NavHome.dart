@@ -5,12 +5,6 @@ import 'package:international_days/Today.dart';
 // import 'package:search_page/search_page.dart';
 import 'Month.dart';
 
-class Person {
-  final String name, surname;
-  final num age;
-
-  Person(this.name, this.surname, this.age);
-}
 
 class NavHome extends StatefulWidget {
   @override
@@ -18,17 +12,22 @@ class NavHome extends StatefulWidget {
 }
 class _NavHomeState extends State<NavHome> {
   DateTime _dateTime;
-  static List<Person> people = [
-    Person('Mike', 'Barron', 1),
-    Person('Mike', 'Barron', 2),
-    Person('Todd', 'Black', 3),
-    Person('Ahmad', 'Edwards', 4),
-    Person('Anthony', 'Johnson', 5),
-    Person('Annette', 'Brooks', 6),
-    Person('Annette', 'Brooks', 7),
-    Person('Annette', 'Brooks', 8),
-    Person('dk', 'Brooks', 9),
-  ];
+  String finalDate = '';
+  getCurrentDate(){
+
+    var date = new DateTime.now().toString();
+
+    var dateParse = DateTime.parse(date);
+
+    var formattedDate = "${dateParse.day}-${dateParse.month}-${dateParse.year}";
+
+    setState(() {
+
+      finalDate = formattedDate.toString() ;
+
+    });
+
+  }
   DateTime _date = DateTime.now();
   @override
   List<Widget> containers = [
@@ -99,35 +98,35 @@ class _NavHomeState extends State<NavHome> {
         context: context,
         builder: (BuildContext context) {
           // return object of type Dialog
-          return AlertDialog(
-            title: new Text("Search"),
-            content: Column(
-                children: <Widget>[
-                  new TextFormField(
-                    maxLength: 10,
-                    readOnly: true,
-                    // validator: validateDob,
-                    onTap: (){
-                      setState(() {
-                        _selectDate(context);
-                      });
-                    },
-                    decoration: new InputDecoration(hintText: (_date.toString())),
-                  ),
-                ],
-
+          return Dialog(
+            backgroundColor: Colors.cyan,
+//            title: new Text("Search"),
+             child: new Card(
+              child: new ListTile(
+                leading: new Icon(Icons.location_on),
+                title: new TextField(
+                  decoration: new InputDecoration(
+                      hintText: 'Your Location', border: InputBorder.none),
+                ),
+              ),
             ),
 
+//            content: Column(
+//                children: <Widget>[
+//                ],
+//
+//            ),
 
-            actions: <Widget>[
-              // usually buttons at the bottom of the dialog
-              new FlatButton(
-                child: new Text("Close"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+//
+//            actions: <Widget>[
+//              // usually buttons at the bottom of the dialog
+//              new FlatButton(
+//                child: new Text("Submit"),
+//                onPressed: () {
+//                  Navigator.of(context).pop();
+//                },
+//              ),
+//            ],
           );
         },
       );
@@ -143,21 +142,20 @@ class _NavHomeState extends State<NavHome> {
           title: Text("International Days"),
           actions: <Widget>[
             IconButton(
-
+//              icon: Text("IN"),
               icon: Icon(
-                Icons.search,
+
+                Icons.location_on,
                 color: Colors.white,
               ),
               onPressed: () {
                 // do something
                 _showDialog();
-                print("darshan");
-                print(_dateTime);
                 },
-
             )
           ],
           bottom: TabBar(
+            indicatorColor: Colors.white,
             isScrollable: true,
             tabs: <Widget>[
               Tab(
@@ -205,35 +203,6 @@ class _NavHomeState extends State<NavHome> {
         body: TabBarView(
           children: containers,
         ),
-//         floatingActionButton: FloatingActionButton(
-//           tooltip: 'Search people',
-//           backgroundColor: Colors.black,
-//           onPressed: () => showSearch(
-//             context: context,
-//             delegate: SearchPage<Person>(
-//               items: people,
-//               searchLabel: 'Search',
-//               suggestion: Center(
-//                 child: Text('Search Clint by Clint Name, Clint Type'),
-//               ),
-//               failure: Center(
-//                 child: Text('No person found :('),
-//               ),
-//               filter: (person) => [
-//                 person.name,
-//                 person.surname,
-//                 person.age.toString(),
-//               ],
-//               builder: (person) => ListTile(
-//                 title: Text(person.name),
-// //                subtitle: Text(person.surname),
-// //                trailing: Text('${person.age} Year'),
-//               ),
-//             ),
-//           ),
-//           child: Icon(Icons.search),
-//         ),
-
       ),
     );
 

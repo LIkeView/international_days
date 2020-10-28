@@ -56,6 +56,7 @@ class _monthState extends State<Month>{
   final _debouncer = Debouncer(milliseconds: 500);
   TextEditingController controller = new TextEditingController();
   int newoneindex =0;
+  bool isfirstcall =true;
 
 
 
@@ -64,7 +65,7 @@ class _monthState extends State<Month>{
       this.value = index;
     }
     Future<String> _getMoreData() async{
-      var url ="http://4foxwebsolution.com/festivals.com/api/getFestivals";
+      var url ="http://festivel.likeview.in/api/getFestivals";
 //    print(url);
     FormData formData = new FormData.fromMap({
       "fest_id" : value
@@ -73,7 +74,12 @@ class _monthState extends State<Month>{
 //    print(response.data);
     setState(() {
       users = response.data['res_data']['festival_details'];
-      filteredUser = users;
+      if(isfirstcall)
+        {
+          filteredUser = users;
+          isfirstcall = false;
+        }
+//      filteredUser = users;
     });
     return "Success";
   }
@@ -192,21 +198,47 @@ class _monthState extends State<Month>{
                 decoration: new InputDecoration(
                     hintText: 'Search', border: InputBorder.none),
                 onChanged:(String text) {
-                  filteredUser.clear();
+//                  print(newoneindex);
+//                  print("DK1"+users.length.toString());
+//                  print("DK2"+filteredUser.length.toString());
+//                  users.clear();
+//                  print("DK3"+users.length.toString());
+//                  print("DK4"+filteredUser.length.toString());
                   if (text.isEmpty) {
                     setState(() {});
                     return;
                   }
-                  for(int i = newoneindex; i< filteredUser.length;i++) {
-                    (filteredUser[i]["fes_name"].contains(text));
-                      // filteredUser.add(userDetail);
-                  };
+                  print("DK1");
+
+                  List filteru = new List();
+                  for(int i=0;i<users.length;i++)
+                    {
+
+                      if(users[i]["fes_name"].toString().toLowerCase().contains(text.toLowerCase()) || users[i]["m_date"].toString().toLowerCase().contains(text.toLowerCase())|| users[i]["fes_cat"].toString().toLowerCase().contains(text.toLowerCase()) ){
+                        filteru.add(users[i]);
+                      }
+                    }
+                  if(text.length == 0){
+                    isfirstcall = true;
+                  }
+//                  }
+                  print(filteru.length);
+                  filteredUser = filteru;
+                  print(filteredUser[0]["fes_name"].toString());
+
+//                  users.forEach((userDetail) {
+//                    print("111DK");
+//                    if(userDetail["fes_name"].contains(text)){
+//                      filteredUser.add(userDetail);
+//                    }
+//                  });
                   setState(() {});
 
                 },
               ),
               trailing: new IconButton(icon: new Icon(Icons.cancel), onPressed: () {
               controller.clear();
+              isfirstcall = true;
               },),
               ),
               ),
@@ -219,6 +251,7 @@ class _monthState extends State<Month>{
 
                       itemBuilder: (BuildContext context, int index ) {
                         this.newoneindex=index;
+//                        print(index);
                       Random random = new Random();
                       var baseColor = colors[colorIndex] as dynamic;
                       Color color1 = baseColor[800];
@@ -232,6 +265,7 @@ class _monthState extends State<Month>{
                       //                        }
                       //                        else {
                       return new Container(
+
                         child: GestureDetector(
                           onTap: () async {
                             newindex = filteredUser[index]
